@@ -33,10 +33,10 @@ describe('MoviesController', () => {
   describe('create', () => {
     it('should create new movie', async () => {
       const body: CreateMovieDto = {
-        title: 'Nada de Novo no Front',
+        title: 'Mr Beans Holiday',
         description:
-          'Convocado para a linha de frente da Primeira Guerra Mundial, o adolescente Paul encara a dura realidade da vida nas trincheiras',
-        genre: 'Drama',
+          'The hapless Mr. Bean takes a vacation on the French Riviera, where he becomes ensnared in an accidental kidnapping and a case of mistaken identity.',
+        genre: 'Comedies',
         release: 2022,
       };
       const movieEntityMock = { ...body } as Movie;

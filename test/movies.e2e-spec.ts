@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 
 // import { MoviesModule } from '../src/movies/movies.module';
@@ -27,7 +27,7 @@ describe('MoviesController (e2e)', () => {
       Repository<Movie>
     >(getRepositoryToken(Movie));
     await moviesRepository.query(`DELETE FROM movies;`);
-
+    app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });
 
@@ -78,6 +78,45 @@ describe('MoviesController (e2e)', () => {
         .expect(409)
         .then((response) => {
           expect(response.body.message).toBe('Movie already exists');
+        });
+    });
+
+    it('should throw a exception if required props empty)', async () => {
+      const movie = {
+        title: '',
+        description: '',
+        genre: '',
+        release: 2010,
+      };
+      return request(app.getHttpServer())
+        .post('/movies')
+        .send(movie)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).toEqual([
+            'title should not be empty',
+            'description should not be empty',
+            'genre should not be empty',
+          ]);
+        });
+    });
+
+    it('should throw a exception if release not a number)', async () => {
+      const movie = {
+        title: 'King of Clones',
+        description:
+          'From groundbreaking human cloning research to a scandalous downfall, this documentary tells the captivating story of Koreas most notorious scientist.',
+        genre: 'Documentaries',
+        release: 'two thousand twenty-three',
+      };
+      return request(app.getHttpServer())
+        .post('/movies')
+        .send(movie)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).toEqual([
+            'release must be an integer number',
+          ]);
         });
     });
   });

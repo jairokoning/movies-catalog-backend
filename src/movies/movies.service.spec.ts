@@ -37,9 +37,9 @@ describe('MoviesService', () => {
 
   it('should create and save new movie', async () => {
     const data: CreateMovieDto = {
-      title: 'Nada de Novo no Front',
+      title: 'All Quiet on the Western Front',
       description:
-        'Convocado para a linha de frente da Primeira Guerra Mundial, o adolescente Paul encara a dura realidade da vida nas trincheiras',
+        'When 17-year-old Paul joins the Western Front in World War I, his initial excitement is soon shattered by the grim reality of life in the trenches.',
       genre: 'Drama',
       release: 2022,
     };
