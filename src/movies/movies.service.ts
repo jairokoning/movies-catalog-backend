@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,7 +12,13 @@ export class MoviesService {
     private movieRepository: Repository<Movie>,
   ) {}
 
-  create(createMovieDto: CreateMovieDto) {
+  async create(createMovieDto: CreateMovieDto) {
+    const movieExists = await this.movieRepository.findOne({
+      where: { title: createMovieDto.title },
+    });
+    if (movieExists) {
+      throw new ConflictException('Movie already exists');
+    }
     return this.movieRepository.save(
       this.movieRepository.create(createMovieDto),
     );
