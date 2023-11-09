@@ -44,7 +44,6 @@ describe('MoviesController', () => {
         .spyOn(moviesService, 'create')
         .mockResolvedValueOnce(movieEntityMock);
       const output = await moviesController.create(body);
-
       expect(output).toBeDefined();
       expect(moviesService.create).toHaveBeenCalledTimes(1);
     });

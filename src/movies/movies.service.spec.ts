@@ -4,6 +4,7 @@ import { MoviesService } from './movies.service';
 import { Movie } from './entities/movie.entity';
 import { Repository } from 'typeorm';
 import { CreateMovieDto } from './dto/create-movie.dto';
+import { ConflictException } from '@nestjs/common/exceptions';
 
 describe('MoviesService', () => {
   let moviesService: MoviesService;
@@ -18,6 +19,8 @@ describe('MoviesService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            findOne: jest.fn(),
+            findOneOrFail: jest.fn(),
           },
         },
       ],
@@ -48,5 +51,20 @@ describe('MoviesService', () => {
     expect(output).toBeDefined();
     expect(movieRepository.create).toHaveBeenCalledTimes(1);
     expect(movieRepository.save).toHaveBeenCalledTimes(1);
+  });
+
+  it('should throw new error if movie already exists', async () => {
+    const data: CreateMovieDto = {
+      title: 'Saving Private Ryan',
+      description:
+        'After braving D-Day, Capt. John Miller leads a band of soldiers behind enemy lines to find a paratrooper whose three brothers have been killed in action.',
+      genre: 'Drama',
+      release: 1998,
+    };
+    const movieEntityMock = { ...data } as unknown as Promise<Movie>;
+    jest.spyOn(movieRepository, 'findOne').mockReturnValueOnce(movieEntityMock);
+    await expect(moviesService.create(data)).rejects.toThrow(
+      new ConflictException('Movie already exists'),
+    );
   });
 });
