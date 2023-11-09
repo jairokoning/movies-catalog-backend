@@ -1,1 +1,6 @@
-export class CreateMovieDto {}
+export class CreateMovieDto {
+  title: string;
+  description: string;
+  genre: string;
+  release: number;
+}
