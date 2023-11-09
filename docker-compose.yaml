@@ -1,13 +1,33 @@
 services:
   app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
     ports:
       - 3000:3000
     volumes:
       - .:/home/node/app
+    depends_on:
+      - db
 
   db:
     image: postgres:13-alpine
+    ports:
+      - 5432:5432
     environment:
-      POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: app
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=A1234z
+      - POSTGRES_DB=movies_catalog_db
+  
+  db_test:
+    env_file:
+      - .env.test
+    image: postgres:13-alpine
+    ports:
+      - 5435:5432    
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=123456    
+      - POSTGRES_DB=movies_catalog_test_db
+    tmpfs:
+      - /var/lib/postgresql/data
