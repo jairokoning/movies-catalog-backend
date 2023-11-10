@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -28,10 +32,14 @@ export class MoviesService {
     return this.movieRepository.find();
   }
 
-  findOne(id: string) {
-    return this.movieRepository.findOneOrFail({
-      where: { id },
-    });
+  async findOne(id: string) {
+    try {
+      return await this.movieRepository.findOneOrFail({
+        where: { id },
+      });
+    } catch (error) {
+      throw new NotFoundException('Movie not found');
+    }
   }
 
   update(id: number, updateMovieDto: UpdateMovieDto) {
