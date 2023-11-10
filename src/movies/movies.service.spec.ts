@@ -8,6 +8,7 @@ import { ConflictException } from '@nestjs/common/exceptions';
 
 const movieEntityList: Movie[] = [
   new Movie({
+    id: '1481f13a-d0f6-476b-9535-a2f4a98e51a7',
     title: 'Mr Beans Holiday',
     description:
       'The hapless Mr. Bean takes a vacation on the French Riviera, where he becomes ensnared in an accidental kidnapping and a case of mistaken identity.',
@@ -15,6 +16,7 @@ const movieEntityList: Movie[] = [
     release: 2022,
   }),
   new Movie({
+    id: 'dbcf8192-3f8d-4381-9fdf-b05e9aaeda52',
     title: 'Saving Private Ryan',
     description:
       'After braving D-Day, Capt. John Miller leads a band of soldiers behind enemy lines to find a paratrooper whose three brothers have been killed in action.',
@@ -22,6 +24,7 @@ const movieEntityList: Movie[] = [
     release: 1998,
   }),
   new Movie({
+    id: '3dc6e8a1-4486-4be5-9fae-ff3da31607b2',
     title: 'Race to the Summit',
     description:
       'Fearless alpine climbers Ueli Steck and Dani Arnold enter into a death-defying rivalry to set speed records on the Swiss Alps great north faces.',
@@ -40,7 +43,7 @@ const updatedMovieEntityItem = new Movie({
 
 describe('MoviesService', () => {
   let moviesService: MoviesService;
-  let movieRepository: Repository<Movie>;
+  let moviesRepository: Repository<Movie>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -58,7 +61,7 @@ describe('MoviesService', () => {
             save: jest.fn().mockResolvedValue(movieEntityList[0]),
             find: jest.fn().mockResolvedValue(movieEntityList),
             findOne: jest.fn().mockResolvedValue(movieEntityList[0]),
-            //findOneOrFail: jest.fn().mockResolvedValue(movieEntityList[0]),
+            findOneOrFail: jest.fn().mockResolvedValue(movieEntityList[2]),
             merge: jest.fn().mockReturnValue(updatedMovieEntityItem),
             softDelete: jest.fn().mockReturnValue(undefined),
           },
@@ -67,12 +70,12 @@ describe('MoviesService', () => {
     }).compile();
 
     moviesService = module.get<MoviesService>(MoviesService);
-    movieRepository = module.get<Repository<Movie>>(getRepositoryToken(Movie));
+    moviesRepository = module.get<Repository<Movie>>(getRepositoryToken(Movie));
   });
 
   it('should be defined', () => {
     expect(moviesService).toBeDefined();
-    expect(movieRepository).toBeDefined();
+    expect(moviesRepository).toBeDefined();
   });
 
   it('should create and save new movie', async () => {
@@ -84,14 +87,14 @@ describe('MoviesService', () => {
       release: 2022,
     };
     const movieEntityMock = { ...data } as Movie;
-    jest.spyOn(movieRepository, 'create').mockReturnValueOnce(movieEntityMock);
-    jest.spyOn(movieRepository, 'save').mockResolvedValueOnce(movieEntityMock);
-    jest.spyOn(movieRepository, 'findOne').mockResolvedValueOnce(undefined);
+    jest.spyOn(moviesRepository, 'create').mockReturnValueOnce(movieEntityMock);
+    jest.spyOn(moviesRepository, 'save').mockResolvedValueOnce(movieEntityMock);
+    jest.spyOn(moviesRepository, 'findOne').mockResolvedValueOnce(undefined);
     const output = await moviesService.create(data);
     expect(output).toBeDefined();
     expect(output).toEqual(data);
-    expect(movieRepository.create).toHaveBeenCalledTimes(1);
-    expect(movieRepository.save).toHaveBeenCalledTimes(1);
+    expect(moviesRepository.create).toHaveBeenCalledTimes(1);
+    expect(moviesRepository.save).toHaveBeenCalledTimes(1);
   });
 
   it('should throw new error if movie already exists', async () => {
@@ -108,8 +111,16 @@ describe('MoviesService', () => {
   });
 
   it('should return a movie entity list', async () => {
-    const result = await moviesService.findAll();
-    expect(result).toEqual(movieEntityList);
-    expect(movieRepository.find).toHaveBeenCalledTimes(1);
+    const output = await moviesService.findAll();
+    expect(output).toEqual(movieEntityList);
+    expect(moviesRepository.find).toHaveBeenCalledTimes(1);
+  });
+
+  it('should return a single movie entity', async () => {
+    const output = await moviesService.findOne(
+      '3dc6e8a1-4486-4be5-9fae-ff3da31607b2',
+    );
+    expect(output).toEqual(movieEntityList[2]);
+    expect(moviesRepository.findOneOrFail).toHaveBeenCalledTimes(1);
   });
 });

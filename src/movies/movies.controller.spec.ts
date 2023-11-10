@@ -6,6 +6,7 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 
 const movieEntityList: Movie[] = [
   new Movie({
+    id: '1481f13a-d0f6-476b-9535-a2f4a98e51a7',
     title: 'Mr Beans Holiday',
     description:
       'The hapless Mr. Bean takes a vacation on the French Riviera, where he becomes ensnared in an accidental kidnapping and a case of mistaken identity.',
@@ -13,6 +14,7 @@ const movieEntityList: Movie[] = [
     release: 2022,
   }),
   new Movie({
+    id: 'dbcf8192-3f8d-4381-9fdf-b05e9aaeda52',
     title: 'Saving Private Ryan',
     description:
       'After braving D-Day, Capt. John Miller leads a band of soldiers behind enemy lines to find a paratrooper whose three brothers have been killed in action.',
@@ -20,6 +22,7 @@ const movieEntityList: Movie[] = [
     release: 1998,
   }),
   new Movie({
+    id: '3dc6e8a1-4486-4be5-9fae-ff3da31607b2',
     title: 'Race to the Summit',
     description:
       'Fearless alpine climbers Ueli Steck and Dani Arnold enter into a death-defying rivalry to set speed records on the Swiss Alps great north faces.',
@@ -41,8 +44,8 @@ describe('MoviesController', () => {
           useValue: {
             create: jest.fn(),
             findAll: jest.fn().mockResolvedValue(movieEntityList),
-            //create: jest.fn().mockResolvedValue(newMovieEntity),
-            //findOneOrFail: jest.fn().mockResolvedValue(movieEntityList[0]),
+            findOne: jest.fn().mockResolvedValue(movieEntityList[1]),
+            //findOneOrFail: jest.fn().mockResolvedValue(movieEntityList[1]),
             //update: jest.fn().mockResolvedValue(updatedMovieEntity),
             //deleteById: jest.fn().mockResolvedValue(undefined),
           },
@@ -79,10 +82,23 @@ describe('MoviesController', () => {
   });
 
   describe('find all', () => {
-    it('should return a movie list entity', async () => {
+    it('should return a movie entity list', async () => {
       const output = await moviesController.findAll();
       expect(output).toEqual(movieEntityList);
       expect(moviesService.findAll).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('find one', () => {
+    it('should return a single movie entity', async () => {
+      const result = await moviesController.findOne(
+        'dbcf8192-3f8d-4381-9fdf-b05e9aaeda52',
+      );
+      expect(result).toEqual(movieEntityList[1]);
+      expect(moviesService.findOne).toHaveBeenCalledTimes(1);
+      expect(moviesService.findOne).toHaveBeenCalledWith(
+        'dbcf8192-3f8d-4381-9fdf-b05e9aaeda52',
+      );
     });
   });
 });
