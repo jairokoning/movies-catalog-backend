@@ -106,4 +106,10 @@ describe('MoviesService', () => {
       new ConflictException('Movie already exists'),
     );
   });
+
+  it('should return a movie entity list', async () => {
+    const result = await moviesService.findAll();
+    expect(result).toEqual(movieEntityList);
+    expect(movieRepository.find).toHaveBeenCalledTimes(1);
+  });
 });

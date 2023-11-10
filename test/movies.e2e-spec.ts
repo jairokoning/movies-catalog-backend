@@ -119,5 +119,67 @@ describe('MoviesController (e2e)', () => {
           ]);
         });
     });
+
+    it('should list all movies)', async () => {
+      const movies = [
+        new Movie({
+          title: 'Mr Beans Holiday',
+          description:
+            'The hapless Mr. Bean takes a vacation on the French Riviera, where he becomes ensnared in an accidental kidnapping and a case of mistaken identity.',
+          genre: 'Comedies',
+          release: 2022,
+        }),
+        new Movie({
+          title: 'Saving Private Ryan',
+          description:
+            'After braving D-Day, Capt. John Miller leads a band of soldiers behind enemy lines to find a paratrooper whose three brothers have been killed in action.',
+          genre: 'Drama',
+          release: 1998,
+        }),
+        new Movie({
+          title: 'Race to the Summit',
+          description:
+            'Fearless alpine climbers Ueli Steck and Dani Arnold enter into a death-defying rivalry to set speed records on the Swiss Alps great north faces.',
+          genre: 'Documentaries',
+          release: 2023,
+        }),
+      ];
+      const moviesRepository: Repository<Movie> = module.get<Repository<Movie>>(
+        getRepositoryToken(Movie),
+      );
+      await moviesRepository.query(
+        `INSERT INTO movies (id, title, description, genre, release) VALUES('1481f13a-d0f6-476b-9535-a2f4a98e51a7', $1, $2, $3, $4);`,
+        [
+          movies[0].title,
+          movies[0].description,
+          movies[0].genre,
+          movies[0].release,
+        ],
+      );
+      await moviesRepository.query(
+        `INSERT INTO movies (id, title, description, genre, release) VALUES('dbcf8192-3f8d-4381-9fdf-b05e9aaeda52', $1, $2, $3, $4);`,
+        [
+          movies[1].title,
+          movies[1].description,
+          movies[1].genre,
+          movies[1].release,
+        ],
+      );
+      await moviesRepository.query(
+        `INSERT INTO movies (id, title, description, genre, release) VALUES('3dc6e8a1-4486-4be5-9fae-ff3da31607b2', $1, $2, $3, $4);`,
+        [
+          movies[2].title,
+          movies[2].description,
+          movies[2].genre,
+          movies[2].release,
+        ],
+      );
+      return request(app.getHttpServer())
+        .get('/movies')
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toHaveLength(3);
+        });
+    });
   });
 });

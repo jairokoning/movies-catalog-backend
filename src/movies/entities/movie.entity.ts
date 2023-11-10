@@ -28,4 +28,14 @@ export class Movie {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  constructor(movie?: Partial<Movie>) {
+    this.id = movie?.id;
+    this.title = movie?.title;
+    this.description = movie?.description;
+    this.genre = movie?.genre;
+    this.release = movie?.release;
+    this.created_at = movie?.created_at;
+    this.updated_at = movie?.updated_at;
+  }
 }
