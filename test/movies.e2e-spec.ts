@@ -189,5 +189,14 @@ describe('MoviesController (e2e)', () => {
           expect(response.body.id).toEqual(moviesListEntity[2].id);
         });
     });
+
+    it('should throw not found exception if movie not exists)', async () => {
+      return request(app.getHttpServer())
+        .get('/movies/2974ff12-e146-4d06-84ec-cf07a559fa1b')
+        .expect(404)
+        .then((response) => {
+          expect(response.body.message).toEqual('Movie not found');
+        });
+    });
   });
 });

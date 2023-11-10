@@ -4,7 +4,10 @@ import { MoviesService } from './movies.service';
 import { Movie } from './entities/movie.entity';
 import { Repository } from 'typeorm';
 import { CreateMovieDto } from './dto/create-movie.dto';
-import { ConflictException } from '@nestjs/common/exceptions';
+import {
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common/exceptions';
 
 const movieEntityList: Movie[] = [
   new Movie({
@@ -122,5 +125,14 @@ describe('MoviesService', () => {
     );
     expect(output).toEqual(movieEntityList[2]);
     expect(moviesRepository.findOneOrFail).toHaveBeenCalledTimes(1);
+  });
+
+  it('should throw not found exception if movie not exists', async () => {
+    jest
+      .spyOn(moviesRepository, 'findOneOrFail')
+      .mockRejectedValueOnce(undefined);
+    await expect(
+      moviesService.findOne('2974ff12-e146-4d06-84ec-cf07a559fa1b'),
+    ).rejects.toThrow(new NotFoundException('Movie not found'));
   });
 });
