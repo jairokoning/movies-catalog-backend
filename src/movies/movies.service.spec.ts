@@ -172,4 +172,11 @@ describe('MoviesService', () => {
     expect(moviesRepository.findOne).toHaveBeenCalledTimes(1);
     expect(moviesRepository.softDelete).toHaveBeenCalledTimes(1);
   });
+
+  it('should throw not found exception if movie not exists', async () => {
+    jest.spyOn(moviesRepository, 'findOne').mockResolvedValueOnce(undefined);
+    await expect(
+      moviesService.remove('2974ff12-e146-4d06-84ec-cf07a559fa1b'),
+    ).rejects.toThrow(new NotFoundException('Movie not found'));
+  });
 });

@@ -252,5 +252,14 @@ describe('MoviesController (e2e)', () => {
         .delete('/movies/dbcf8192-3f8d-4381-9fdf-b05e9aaeda52')
         .expect(200);
     });
+
+    it('should throw not found exception if movie not exists)', async () => {
+      return request(app.getHttpServer())
+        .delete('/movies/2974ff12-e146-4d06-84ec-cf07a559fa1b')
+        .expect(404)
+        .then((response) => {
+          expect(response.body.message).toEqual('Movie not found');
+        });
+    });
   });
 });
