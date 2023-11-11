@@ -42,11 +42,11 @@ export class MoviesService {
     }
   }
 
-  update(id: number, updateMovieDto: UpdateMovieDto) {
+  update(id: string, updateMovieDto: UpdateMovieDto) {
     return this.movieRepository.update(id, updateMovieDto);
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} movie`;
   }
 }
