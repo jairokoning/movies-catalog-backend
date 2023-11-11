@@ -3,6 +3,7 @@ import { MoviesController } from './movies.controller';
 import { MoviesService } from './movies.service';
 import { Movie } from './entities/movie.entity';
 import { CreateMovieDto } from './dto/create-movie.dto';
+import { UpdateMovieDto } from './dto/update-movie.dto';
 
 const movieEntityList: Movie[] = [
   new Movie({
@@ -31,6 +32,15 @@ const movieEntityList: Movie[] = [
   }),
 ];
 
+const updatedMovieEntity = new Movie({
+  id: 'dbcf8192-3f8d-4381-9fdf-b05e9aaeda52',
+  title: 'Saving Private Ryan',
+  description:
+    'After braving D-Day, Capt. John Miller leads a band of soldiers behind enemy lines to find a paratrooper whose three brothers have been killed in action.',
+  genre: 'War | Drama',
+  release: 1998,
+});
+
 describe('MoviesController', () => {
   let moviesController: MoviesController;
   let moviesService: MoviesService;
@@ -46,7 +56,7 @@ describe('MoviesController', () => {
             findAll: jest.fn().mockResolvedValue(movieEntityList),
             findOne: jest.fn().mockResolvedValue(movieEntityList[1]),
             //findOneOrFail: jest.fn().mockResolvedValue(movieEntityList[1]),
-            //update: jest.fn().mockResolvedValue(updatedMovieEntity),
+            update: jest.fn().mockResolvedValue(updatedMovieEntity),
             //deleteById: jest.fn().mockResolvedValue(undefined),
           },
         },
@@ -98,6 +108,28 @@ describe('MoviesController', () => {
       expect(moviesService.findOne).toHaveBeenCalledTimes(1);
       expect(moviesService.findOne).toHaveBeenCalledWith(
         'dbcf8192-3f8d-4381-9fdf-b05e9aaeda52',
+      );
+    });
+  });
+
+  describe('update', () => {
+    it('should update a todo item successfully', async () => {
+      const body: UpdateMovieDto = {
+        title: 'Saving Private Ryan',
+        description:
+          'After braving D-Day, Capt. John Miller leads a band of soldiers behind enemy lines to find a paratrooper whose three brothers have been killed in action.',
+        genre: 'War | Drama',
+        release: 1998,
+      };
+      const result = await moviesController.update(
+        'dbcf8192-3f8d-4381-9fdf-b05e9aaeda52',
+        body,
+      );
+      expect(result).toEqual(updatedMovieEntity);
+      expect(moviesService.update).toHaveBeenCalledTimes(1);
+      expect(moviesService.update).toHaveBeenCalledWith(
+        'dbcf8192-3f8d-4381-9fdf-b05e9aaeda52',
+        body,
       );
     });
   });

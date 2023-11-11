@@ -198,5 +198,18 @@ describe('MoviesController (e2e)', () => {
           expect(response.body.message).toEqual('Movie not found');
         });
     });
+
+    it('should update movie)', async () => {
+      return request(app.getHttpServer())
+        .put('/movies/dbcf8192-3f8d-4381-9fdf-b05e9aaeda52')
+        .send({
+          title: 'Saving Private Ryan',
+          description:
+            'After braving D-Day, Capt. John Miller leads a band of soldiers behind enemy lines to find a paratrooper whose three brothers have been killed in action.',
+          genre: 'War | Drama',
+          release: 1998,
+        })
+        .expect(200);
+    });
   });
 });

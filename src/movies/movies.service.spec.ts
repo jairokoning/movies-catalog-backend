@@ -8,6 +8,7 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common/exceptions';
+import { UpdateMovieDto } from './dto/update-movie.dto';
 
 const movieEntityList: Movie[] = [
   new Movie({
@@ -37,6 +38,7 @@ const movieEntityList: Movie[] = [
 ];
 
 const updatedMovieEntityItem = new Movie({
+  id: 'dbcf8192-3f8d-4381-9fdf-b05e9aaeda52',
   title: 'Saving Private Ryan',
   description:
     'After braving D-Day, Capt. John Miller leads a band of soldiers behind enemy lines to find a paratrooper whose three brothers have been killed in action.',
@@ -55,17 +57,11 @@ describe('MoviesService', () => {
         {
           provide: getRepositoryToken(Movie),
           useValue: {
-            create: jest.fn(),
-            // save: jest.fn(),
-            // find: jest.fn(),
-            // findOne: jest.fn(),
-            // findOneOrFail: jest.fn(),
-            //create: jest.fn().mockReturnValue(movieEntityList[0]),
             save: jest.fn().mockResolvedValue(movieEntityList[0]),
             find: jest.fn().mockResolvedValue(movieEntityList),
             findOne: jest.fn().mockResolvedValue(movieEntityList[0]),
             findOneOrFail: jest.fn().mockResolvedValue(movieEntityList[2]),
-            merge: jest.fn().mockReturnValue(updatedMovieEntityItem),
+            update: jest.fn().mockReturnValue(updatedMovieEntityItem),
             softDelete: jest.fn().mockReturnValue(undefined),
           },
         },
@@ -134,5 +130,23 @@ describe('MoviesService', () => {
     await expect(
       moviesService.findOne('2974ff12-e146-4d06-84ec-cf07a559fa1b'),
     ).rejects.toThrow(new NotFoundException('Movie not found'));
+  });
+
+  it('should update a movie', async () => {
+    const data: UpdateMovieDto = {
+      title: 'Saving Private Ryan',
+      description:
+        'After braving D-Day, Capt. John Miller leads a band of soldiers behind enemy lines to find a paratrooper whose three brothers have been killed in action.',
+      genre: 'War | Drama',
+      release: 1998,
+    };
+    jest
+      .spyOn(moviesRepository, 'save')
+      .mockResolvedValueOnce(updatedMovieEntityItem);
+    const output = await moviesService.update(
+      'dbcf8192-3f8d-4381-9fdf-b05e9aaeda52',
+      data,
+    );
+    expect(output).toEqual(updatedMovieEntityItem);
   });
 });
