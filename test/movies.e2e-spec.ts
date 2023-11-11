@@ -224,5 +224,27 @@ describe('MoviesController (e2e)', () => {
         })
         .expect(409);
     });
+
+    it('should throw a exception if required props empty)', async () => {
+      const movie = {
+        title: '',
+        description: '',
+        genre: '',
+        release: '',
+      };
+      return request(app.getHttpServer())
+        .put('/movies/dbcf8192-3f8d-4381-9fdf-b05e9aaeda52')
+        .send(movie)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).toEqual([
+            'title should not be empty',
+            'description should not be empty',
+            'genre should not be empty',
+            'release must be an integer number',
+            'release should not be empty',
+          ]);
+        });
+    });
   });
 });
