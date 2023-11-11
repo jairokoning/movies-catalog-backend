@@ -55,9 +55,8 @@ describe('MoviesController', () => {
             create: jest.fn(),
             findAll: jest.fn().mockResolvedValue(movieEntityList),
             findOne: jest.fn().mockResolvedValue(movieEntityList[1]),
-            //findOneOrFail: jest.fn().mockResolvedValue(movieEntityList[1]),
             update: jest.fn().mockResolvedValue(updatedMovieEntity),
-            //deleteById: jest.fn().mockResolvedValue(undefined),
+            remove: jest.fn().mockResolvedValue(undefined),
           },
         },
       ],
@@ -130,6 +129,16 @@ describe('MoviesController', () => {
       expect(moviesService.update).toHaveBeenCalledWith(
         'dbcf8192-3f8d-4381-9fdf-b05e9aaeda52',
         body,
+      );
+    });
+  });
+
+  describe('remove', () => {
+    it('should delete a movie', async () => {
+      await moviesController.remove('dbcf8192-3f8d-4381-9fdf-b05e9aaeda52');
+      expect(moviesService.remove).toHaveBeenCalledTimes(1);
+      expect(moviesService.remove).toHaveBeenCalledWith(
+        'dbcf8192-3f8d-4381-9fdf-b05e9aaeda52',
       );
     });
   });

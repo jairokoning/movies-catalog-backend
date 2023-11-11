@@ -246,5 +246,11 @@ describe('MoviesController (e2e)', () => {
           ]);
         });
     });
+
+    it('should delete a movie)', async () => {
+      return request(app.getHttpServer())
+        .delete('/movies/dbcf8192-3f8d-4381-9fdf-b05e9aaeda52')
+        .expect(200);
+    });
   });
 });

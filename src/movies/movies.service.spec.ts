@@ -166,4 +166,10 @@ describe('MoviesService', () => {
       new ConflictException('Already exists Movie with same Title'),
     );
   });
+
+  it('should delete a movie', async () => {
+    await moviesService.remove('dbcf8192-3f8d-4381-9fdf-b05e9aaeda52');
+    expect(moviesRepository.findOne).toHaveBeenCalledTimes(1);
+    expect(moviesRepository.softDelete).toHaveBeenCalledTimes(1);
+  });
 });
