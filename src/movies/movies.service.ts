@@ -7,7 +7,7 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Movie } from './entities/movie.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 
 @Injectable()
 export class MoviesService {
@@ -42,7 +42,14 @@ export class MoviesService {
     }
   }
 
-  update(id: string, updateMovieDto: UpdateMovieDto) {
+  async update(id: string, updateMovieDto: UpdateMovieDto) {
+    const movieExists = await this.movieRepository.findOne({
+      where: { title: updateMovieDto.title, id: Not(id) },
+    });
+    if (movieExists) {
+      console.log(movieExists);
+      throw new ConflictException('Already exists Movie with same Title');
+    }
     return this.movieRepository.update(id, updateMovieDto);
   }
 
