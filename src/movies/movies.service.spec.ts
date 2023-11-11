@@ -57,6 +57,7 @@ describe('MoviesService', () => {
         {
           provide: getRepositoryToken(Movie),
           useValue: {
+            create: jest.fn(),
             save: jest.fn().mockResolvedValue(movieEntityList[0]),
             find: jest.fn().mockResolvedValue(movieEntityList),
             findOne: jest.fn().mockResolvedValue(movieEntityList[0]),
@@ -140,6 +141,7 @@ describe('MoviesService', () => {
       genre: 'War | Drama',
       release: 1998,
     };
+    jest.spyOn(moviesRepository, 'findOne').mockResolvedValueOnce(undefined);
     jest
       .spyOn(moviesRepository, 'save')
       .mockResolvedValueOnce(updatedMovieEntityItem);
@@ -148,5 +150,20 @@ describe('MoviesService', () => {
       data,
     );
     expect(output).toEqual(updatedMovieEntityItem);
+  });
+
+  it('should throw exception if other movie already exists whith same title', async () => {
+    const data: CreateMovieDto = {
+      title: 'Mr Beans Holiday',
+      description:
+        'After braving D-Day, Capt. John Miller leads a band of soldiers behind enemy lines to find a paratrooper whose three brothers have been killed in action.',
+      genre: 'War | Drama',
+      release: 1998,
+    };
+    await expect(
+      moviesService.update('dbcf8192-3f8d-4381-9fdf-b05e9aaeda52', data),
+    ).rejects.toThrow(
+      new ConflictException('Already exists Movie with same Title'),
+    );
   });
 });

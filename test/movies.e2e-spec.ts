@@ -211,5 +211,18 @@ describe('MoviesController (e2e)', () => {
         })
         .expect(200);
     });
+
+    it('should throw exception if other movie already exists whith same title)', async () => {
+      return request(app.getHttpServer())
+        .put('/movies/dbcf8192-3f8d-4381-9fdf-b05e9aaeda52')
+        .send({
+          title: 'Mr Beans Holiday',
+          description:
+            'After braving D-Day, Capt. John Miller leads a band of soldiers behind enemy lines to find a paratrooper whose three brothers have been killed in action.',
+          genre: 'Drama',
+          release: 1998,
+        })
+        .expect(409);
+    });
   });
 });
