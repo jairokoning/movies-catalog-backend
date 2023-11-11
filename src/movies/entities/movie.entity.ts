@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -29,6 +30,9 @@ export class Movie {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
+  @DeleteDateColumn({ type: 'timestamp' })
+  deleted_at: Date;
+
   constructor(movie?: Partial<Movie>) {
     this.id = movie?.id;
     this.title = movie?.title;
@@ -37,5 +41,6 @@ export class Movie {
     this.release = movie?.release;
     this.created_at = movie?.created_at;
     this.updated_at = movie?.updated_at;
+    this.deleted_at = movie?.deleted_at;
   }
 }

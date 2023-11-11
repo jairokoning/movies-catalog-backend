@@ -47,13 +47,18 @@ export class MoviesService {
       where: { title: updateMovieDto.title, id: Not(id) },
     });
     if (movieExists) {
-      console.log(movieExists);
       throw new ConflictException('Already exists Movie with same Title');
     }
     return this.movieRepository.update(id, updateMovieDto);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} movie`;
+  async remove(id: string) {
+    const moviesExists = await this.movieRepository.findOne({
+      where: { id },
+    });
+    if (!moviesExists) {
+      throw new NotFoundException('Movies not exists');
+    }
+    await this.movieRepository.softDelete(id);
   }
 }
