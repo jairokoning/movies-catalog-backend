@@ -13,28 +13,28 @@ import { Not, Repository } from 'typeorm';
 export class MoviesService {
   constructor(
     @InjectRepository(Movie)
-    private movieRepository: Repository<Movie>,
+    private moviesRepository: Repository<Movie>,
   ) {}
 
   async create(createMovieDto: CreateMovieDto) {
-    const movieExists = await this.movieRepository.findOne({
+    const movieExists = await this.moviesRepository.findOne({
       where: { title: createMovieDto.title },
     });
     if (movieExists) {
       throw new ConflictException('Movie already exists');
     }
-    return this.movieRepository.save(
-      this.movieRepository.create(createMovieDto),
+    return this.moviesRepository.save(
+      this.moviesRepository.create(createMovieDto),
     );
   }
 
   findAll() {
-    return this.movieRepository.find();
+    return this.moviesRepository.find();
   }
 
   async findOne(id: string) {
     try {
-      return await this.movieRepository.findOneOrFail({
+      return await this.moviesRepository.findOneOrFail({
         where: { id },
       });
     } catch (error) {
@@ -43,22 +43,22 @@ export class MoviesService {
   }
 
   async update(id: string, updateMovieDto: UpdateMovieDto) {
-    const movieExists = await this.movieRepository.findOne({
+    const movieExists = await this.moviesRepository.findOne({
       where: { title: updateMovieDto.title, id: Not(id) },
     });
     if (movieExists) {
       throw new ConflictException('Already exists Movie with same Title');
     }
-    return this.movieRepository.update(id, updateMovieDto);
+    return this.moviesRepository.update(id, updateMovieDto);
   }
 
   async remove(id: string) {
-    const moviesExists = await this.movieRepository.findOne({
+    const moviesExists = await this.moviesRepository.findOne({
       where: { id },
     });
     if (!moviesExists) {
-      throw new NotFoundException('Movies not exists');
+      throw new NotFoundException('Movie not found');
     }
-    await this.movieRepository.softDelete(id);
+    await this.moviesRepository.softDelete(id);
   }
 }
