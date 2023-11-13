@@ -4,7 +4,8 @@ import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MoviesModule } from './movies/movies.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -15,16 +16,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       ],
     }),
     TypeOrmModule.forRoot({
-      type: 'postgres',
+      type: process.env.DATABASE_TYPE,
       host: process.env.DATABASE_HOST,
-      port: parseInt(process.env.DATABASE_PORT, 10),
+      port: process.env.DATABASE_PORT,
       database: process.env.DATABASE_NAME,
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASS,
       entities: [__dirname + '/**/*.entity{.js,.ts}'],
-      synchronize: Boolean(parseInt(process.env.DATABASE_SYNC)),
-    }),
+      synchronize: process.env.DATABASE_SYNC,
+    } as unknown as TypeOrmModuleOptions),
     MoviesModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
