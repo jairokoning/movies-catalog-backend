@@ -15,12 +15,13 @@ dotenv.config();
   imports: [
     ConfigModule.forRoot({
       envFilePath: [
-        join(__dirname, '..', `.env.${process.env.NODE_ENV}`),
-        join(__dirname, '..', '.env.dev'),
+        join(__dirname, '../..', `.env.${process.env.NODE_ENV}`),
+        join(__dirname, '../..', '.env.dev'),
       ],
     }),
     JwtModule.register({
-      privateKey: `${process.env.JWT_SECRET_TOKEN}`,
+      //privateKey: 'UpT6B4Jcm+/lTfZLPk/HLIyYDDj9loJwbXy6vkpmlsc=',
+      privateKey: process.env.JWT_SECRET_TOKEN,
       signOptions: { expiresIn: '60s' },
     }),
     UsersModule,
