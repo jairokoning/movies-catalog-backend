@@ -6,6 +6,9 @@ import { Repository } from 'typeorm';
 import { Movie } from '../src/movies/entities/movie.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { describe } from 'node:test';
+import { hashSync } from 'bcrypt';
+import { User } from '../src/users/entities/user.entity';
+import { AuthController } from '../src/auth/auth.controller';
 
 const moviesListEntity = [
   new Movie({
@@ -34,9 +37,17 @@ const moviesListEntity = [
   }),
 ];
 
+const user = {
+  id: '1e4bbe81-5c8f-4b6d-9f52-567ae1cfcec0',
+  email: 'jane.doe@example.com',
+  password: '&jAnE1995%',
+};
+
 describe('MoviesController (e2e)', () => {
   let app: INestApplication;
   let module: TestingModule;
+  let authController: AuthController;
+  let jwt = { token: '' };
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -79,6 +90,18 @@ describe('MoviesController (e2e)', () => {
         moviesListEntity[2].release,
       ],
     );
+    const usersRepository: Repository<User> = moduleFixture.get<
+      Repository<User>
+    >(getRepositoryToken(Movie));
+    await usersRepository.query(`DELETE FROM users;`);
+    await usersRepository.query(
+      `INSERT INTO users(id, email, password, created_at) VALUES($1, $2, $3, $4);`,
+      [user.id, user.email, hashSync(user.password, 10), new Date()],
+    );
+
+    authController = module.get<AuthController>(AuthController);
+    jwt = await authController.login({ user: user });
+
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });
@@ -99,8 +122,9 @@ describe('MoviesController (e2e)', () => {
         release: 2016,
       };
       return request(app.getHttpServer())
-        .post('/movies')
+        .post('/movies') //  .auth(user.email, user.password) .set('Authorization', `Bearer ${jwt.token}`)
         .send(movie)
+        .set({ Authorization: `Bearer ${jwt.token}` })
         .expect(201)
         .then((response) => {
           const data = response.body;
@@ -127,6 +151,7 @@ describe('MoviesController (e2e)', () => {
       return request(app.getHttpServer())
         .post('/movies')
         .send(movie)
+        .set({ Authorization: `Bearer ${jwt.token}` })
         .expect(409)
         .then((response) => {
           expect(response.body.message).toBe('Movie already exists');
@@ -143,6 +168,7 @@ describe('MoviesController (e2e)', () => {
       return request(app.getHttpServer())
         .post('/movies')
         .send(movie)
+        .set({ Authorization: `Bearer ${jwt.token}` })
         .expect(400)
         .then((response) => {
           expect(response.body.message).toEqual([
@@ -164,6 +190,7 @@ describe('MoviesController (e2e)', () => {
       return request(app.getHttpServer())
         .post('/movies')
         .send(movie)
+        .set({ Authorization: `Bearer ${jwt.token}` })
         .expect(400)
         .then((response) => {
           expect(response.body.message).toEqual([
@@ -175,6 +202,7 @@ describe('MoviesController (e2e)', () => {
     it('should list all movies)', async () => {
       return request(app.getHttpServer())
         .get('/movies')
+        .set({ Authorization: `Bearer ${jwt.token}` })
         .expect(200)
         .then((response) => {
           expect(response.body).toHaveLength(3);
@@ -184,6 +212,7 @@ describe('MoviesController (e2e)', () => {
     it('should show a single movie)', async () => {
       return request(app.getHttpServer())
         .get('/movies/3dc6e8a1-4486-4be5-9fae-ff3da31607b2')
+        .set({ Authorization: `Bearer ${jwt.token}` })
         .expect(200)
         .then((response) => {
           expect(response.body.id).toEqual(moviesListEntity[2].id);
@@ -193,6 +222,7 @@ describe('MoviesController (e2e)', () => {
     it('should throw not found exception if movie not exists)', async () => {
       return request(app.getHttpServer())
         .get('/movies/2974ff12-e146-4d06-84ec-cf07a559fa1b')
+        .set({ Authorization: `Bearer ${jwt.token}` })
         .expect(404)
         .then((response) => {
           expect(response.body.message).toEqual('Movie not found');
@@ -209,6 +239,7 @@ describe('MoviesController (e2e)', () => {
           genre: 'War | Drama',
           release: 1998,
         })
+        .set({ Authorization: `Bearer ${jwt.token}` })
         .expect(200);
     });
 
@@ -222,6 +253,7 @@ describe('MoviesController (e2e)', () => {
           genre: 'Drama',
           release: 1998,
         })
+        .set({ Authorization: `Bearer ${jwt.token}` })
         .expect(409);
     });
 
@@ -235,6 +267,7 @@ describe('MoviesController (e2e)', () => {
       return request(app.getHttpServer())
         .put('/movies/dbcf8192-3f8d-4381-9fdf-b05e9aaeda52')
         .send(movie)
+        .set({ Authorization: `Bearer ${jwt.token}` })
         .expect(400)
         .then((response) => {
           expect(response.body.message).toEqual([
@@ -250,12 +283,14 @@ describe('MoviesController (e2e)', () => {
     it('should delete a movie)', async () => {
       return request(app.getHttpServer())
         .delete('/movies/dbcf8192-3f8d-4381-9fdf-b05e9aaeda52')
+        .set({ Authorization: `Bearer ${jwt.token}` })
         .expect(200);
     });
 
     it('should throw not found exception if movie not exists)', async () => {
       return request(app.getHttpServer())
         .delete('/movies/2974ff12-e146-4d06-84ec-cf07a559fa1b')
+        .set({ Authorization: `Bearer ${jwt.token}` })
         .expect(404)
         .then((response) => {
           expect(response.body.message).toEqual('Movie not found');
