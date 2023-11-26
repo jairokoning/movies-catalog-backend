@@ -20,7 +20,6 @@ dotenv.config();
       ],
     }),
     JwtModule.register({
-      //privateKey: 'UpT6B4Jcm+/lTfZLPk/HLIyYDDj9loJwbXy6vkpmlsc=',
       privateKey: process.env.JWT_SECRET_TOKEN,
       signOptions: { expiresIn: '60s' },
     }),
