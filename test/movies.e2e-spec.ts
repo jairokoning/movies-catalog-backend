@@ -199,6 +199,22 @@ describe('MoviesController (e2e)', () => {
         });
     });
 
+    it('should throw a 401 exception on create movie if user not a authenticated)', async () => {
+      const movie = {
+        title: 'The Hidden Lives of Pets',
+        description:
+          'Bow wows and purr-fect pets! Meet amazing creatures from around the world and dig into the latest science on our animal friends senses and skills.',
+        genre: 'Documentaries',
+        release: 2022,
+      };
+      return request(app.getHttpServer())
+        .post('/movies')
+        .send(movie)
+        .expect(401);
+    });
+  });
+
+  describe('List | /movies (GET)', () => {
     it('should list all movies)', async () => {
       return request(app.getHttpServer())
         .get('/movies')
@@ -209,6 +225,12 @@ describe('MoviesController (e2e)', () => {
         });
     });
 
+    it('should throw a 401 exception on list movies if user not a authenticated)', async () => {
+      return request(app.getHttpServer()).get('/movies').expect(401);
+    });
+  });
+
+  describe('Show | /movies (GET)', () => {
     it('should show a single movie)', async () => {
       return request(app.getHttpServer())
         .get('/movies/3dc6e8a1-4486-4be5-9fae-ff3da31607b2')
@@ -229,6 +251,14 @@ describe('MoviesController (e2e)', () => {
         });
     });
 
+    it('should throw a 401 exception on show single movie if user not a authenticated)', async () => {
+      return request(app.getHttpServer())
+        .get('/movies/3dc6e8a1-4486-4be5-9fae-ff3da31607b2')
+        .expect(401);
+    });
+  });
+
+  describe('Update | /movies (PUT)', () => {
     it('should update movie)', async () => {
       return request(app.getHttpServer())
         .put('/movies/dbcf8192-3f8d-4381-9fdf-b05e9aaeda52')
@@ -280,6 +310,21 @@ describe('MoviesController (e2e)', () => {
         });
     });
 
+    it('should throw a 401 exception on update movie if user not a authenticated)', async () => {
+      return request(app.getHttpServer())
+        .put('/movies/dbcf8192-3f8d-4381-9fdf-b05e9aaeda52')
+        .send({
+          title: 'Saving Private Ryan',
+          description:
+            'After braving D-Day, Capt. John Miller leads a band of soldiers behind enemy lines to find a paratrooper whose three brothers have been killed in action.',
+          genre: 'War | Drama',
+          release: 1998,
+        })
+        .expect(401);
+    });
+  });
+
+  describe('Delete | /movies (DELETE)', () => {
     it('should delete a movie)', async () => {
       return request(app.getHttpServer())
         .delete('/movies/dbcf8192-3f8d-4381-9fdf-b05e9aaeda52')
@@ -295,6 +340,12 @@ describe('MoviesController (e2e)', () => {
         .then((response) => {
           expect(response.body.message).toEqual('Movie not found');
         });
+    });
+
+    it('should throw a 401 exception on delete movie if user not a authenticated)', async () => {
+      return request(app.getHttpServer())
+        .delete('/movies/dbcf8192-3f8d-4381-9fdf-b05e9aaeda52')
+        .expect(401);
     });
   });
 });
