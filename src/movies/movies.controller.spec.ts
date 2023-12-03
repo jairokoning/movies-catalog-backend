@@ -4,6 +4,7 @@ import { MoviesService } from './movies.service';
 import { Movie } from './entities/movie.entity';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 const movieEntityList: Movie[] = [
   new Movie({
@@ -58,6 +59,10 @@ describe('MoviesController', () => {
             update: jest.fn().mockResolvedValue(updatedMovieEntity),
             remove: jest.fn().mockResolvedValue(undefined),
           },
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: {},
         },
       ],
     }).compile();
