@@ -21,7 +21,7 @@ dotenv.config();
     }),
     JwtModule.register({
       privateKey: process.env.JWT_SECRET_TOKEN,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '6000s' },
     }),
     UsersModule,
     PassportModule,
